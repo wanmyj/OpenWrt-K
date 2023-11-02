@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# 进入指定目录
+cd /usr/lib/lua/luci/controller/ 
+
+# 修改指定函数
+sed -i '/local function fastpath_status()/,/^end$/c\local function fastpath_status()\n\treturn luci.sys.call("/etc/init.d/turboacc check_status fastpath >/dev/null") == 0\nend' turboacc.lua
