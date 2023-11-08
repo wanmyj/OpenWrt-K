@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# 指定文件路径
+file_path="/usr/lib/lua/luci/view/netdata/netdata.htm"
+
+# 检查文件是否存在
+if [ ! -f "$file_path" ]; then
+    echo "File not found!"
+    exit 1
+fi
+
+# 使用 sed 工具完成替换操作
+sed -i 's|document.getElementById("netdata").src = "http://" + window.location.hostname + ":19999";|//document.getElementById("netdata").src = "http://" + window.location.hostname + ":19999";\ndocument.getElementById("netdata").src =  window.location.protocol+"//" + window.location.hostname + "/netdata";|' $file_path
