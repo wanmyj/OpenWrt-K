@@ -2,12 +2,83 @@
 # set password
 (echo gezhang123; sleep 1; echo gezhang123) | /bin/busybox passwd root >/dev/null 2>&1
 # set network
-uci set network.lan.ipaddr="192.168.1.1"
+uci set network.lan.ipaddr="192.168.5.1"
 uci -q set network.wan.username='ad83873692'
 uci -q set network.wan.password='44414367'
 uci set network.wan.proto='pppoe'
 uci commit network
 /etc/init.d/network restart
+
+# set opkg source to utsc
+sed -i 's/downloads.openwrt.org/mirrors.ustc.edu.cn\/openwrt/g' /etc/opkg/distfeeds.conf 
+
+# set dhcp host for xbox
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='xvcf1.xboxlive.com'
+uci set dhcp.@domain[-1].ip='192.168.5.1'
+
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='xvcf2.xboxlive.com'
+uci set dhcp.@domain[-1].ip='192.168.5.1'
+
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='assets1.xboxlive.com'
+uci set dhcp.@domain[-1].ip='192.168.5.1'
+
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='assets2.xboxlive.com'
+uci set dhcp.@domain[-1].ip='192.168.5.1'
+
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='d1.xboxlive.com'
+uci set dhcp.@domain[-1].ip='192.168.5.1'
+
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='d2.xboxlive.com'
+uci set dhcp.@domain[-1].ip='192.168.5.1'
+
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='dlassets.xboxlive.com'
+uci set dhcp.@domain[-1].ip='192.168.5.1'
+
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='dlassets2.xboxlive.com'
+uci set dhcp.@domain[-1].ip='192.168.5.1'
+
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='assets1.xboxlive.cn'
+uci set dhcp.@domain[-1].ip='180.97.161.29'
+
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='assets2.xboxlive.cn'
+uci set dhcp.@domain[-1].ip='180.97.161.29'
+
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='d1.xboxlive.cn'
+uci set dhcp.@domain[-1].ip='180.97.161.29'
+
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='d2.xboxlive.cn'
+uci set dhcp.@domain[-1].ip='180.97.161.29'
+
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='dlassets.xboxlive.cn'
+uci set dhcp.@domain[-1].ip='61.147.216.2'
+
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='dlassets2.xboxlive.cn'
+uci set dhcp.@domain[-1].ip='61.147.216.2'
+
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='dl.delivery.mp.microsoft.com'
+uci set dhcp.@domain[-1].ip='106.116.135.176'
+
+uci add dhcp domain
+uci set dhcp.@domain[-1].name='tlu.dl.delivery.mp.microsoft.com'
+uci set dhcp.@domain[-1].ip='106.116.135.176'
+uci commit dhcp
+
+
 sed -i "/^DISTRIB_DESCRIPTION='/s/'$/ Compiled by 沉默の金'/" /etc/openwrt_release
 [ -d "/etc/init.d" ] && chmod +x /etc/init.d/*
 [ -e "/usr/bin/AdGuardHome/AdGuardHome" ] && chmod 755 /usr/bin/AdGuardHome/AdGuardHome
