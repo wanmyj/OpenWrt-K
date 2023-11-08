@@ -3,9 +3,9 @@
 (echo gezhang123; sleep 1; echo gezhang123) | /bin/busybox passwd root >/dev/null 2>&1
 # set network
 uci set network.lan.ipaddr="192.168.1.1"
-# uci -q set network.wan.username='ad83873692'
-# uci -q set network.wan.password='44414367'
-# uci set network.wan.proto='pppoe'
+uci -q set network.wan.username='ad83873692'
+uci -q set network.wan.password='44414367'
+uci set network.wan.proto='pppoe'
 uci commit network
 /etc/init.d/network restart
 sed -i "/^DISTRIB_DESCRIPTION='/s/'$/ Compiled by 沉默の金'/" /etc/openwrt_release
