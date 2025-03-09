@@ -3,6 +3,7 @@
 ###Proxy
 ##-------------------------------------
 payload:
+
 # > huggingface
   - DOMAIN-SUFFIX,huggingface.co
 
@@ -36,33 +37,36 @@ payload:
   - DOMAIN-SUFFIX,telegram.org
   - DOMAIN-SUFFIX,t.me
   - DOMAIN-SUFFIX,telegram.me
-  # > Telegram Messenger Inc(AS44907 AS62014 AS59930 AS62041)
-  #AS44907
-  - IP-CIDR,91.108.20.0/22
-  - IP-CIDR,91.108.20.0/23
-  - IP-CIDR,91.108.22.0/23
-  - IP-CIDR,2001:b28:f23c::/48
-  # AS62014
-  - IP-CIDR,149.154.168.0/22
-  - IP-CIDR,91.108.16.0/22
-  - IP-CIDR,91.108.56.0/23
-  - IP-CIDR,2001:b28:f23f::/48
-  # AS59930
-  - IP-CIDR,149.154.172.0/22
-  - IP-CIDR,91.108.12.0/22
-  - IP-CIDR,2001:b28:f23d::/48
+  # > Telegram Messenger Inc(AS62041/AS62014/AS59930/AS44907/AS211157)
   # AS62041
+  - IP-CIDR,91.108.4.0/22
+  - IP-CIDR,91.108.8.0/22
+  - IP-CIDR,91.108.56.0/22
+  - IP-CIDR,95.161.64.0/20
   - IP-CIDR,149.154.160.0/22
   - IP-CIDR,149.154.160.0/23
   - IP-CIDR,149.154.162.0/23
   - IP-CIDR,149.154.164.0/22
   - IP-CIDR,149.154.164.0/23
   - IP-CIDR,149.154.166.0/23
-  - IP-CIDR,91.108.4.0/22
-  - IP-CIDR,91.108.56.0/22
-  - IP-CIDR,91.108.8.0/22
-  - IP-CIDR,95.161.64.0/20
   - IP-CIDR,2001:67c:4e8::/48
+  # AS62014
+  - IP-CIDR,91.108.16.0/22
+  - IP-CIDR,91.108.56.0/23
+  - IP-CIDR,149.154.168.0/22
+  - IP-CIDR,2001:b28:f23f::/48
+  # AS59930
+  - IP-CIDR,91.108.12.0/22
+  - IP-CIDR,149.154.172.0/22
+  - IP-CIDR,2001:b28:f23d::/48
+  # AS44907
+  - IP-CIDR,91.108.20.0/22
+  - IP-CIDR,91.108.20.0/23
+  - IP-CIDR,2001:b28:f23c::/48
+  # AS211157
+  - IP-CIDR,91.105.192.0/23
+  - IP-CIDR,185.76.151.0/24
+  - IP-CIDR,2a0a:f280:203::/48
 ## telegram end
 
 # > TapTap Anti-addiction service
@@ -141,6 +145,9 @@ payload:
   - DOMAIN-SUFFIX,box.com
 ##box end
 
+# > civitai
+  - DOMAIN-SUFFIX,civitai.com
+
 # > google
   - DOMAIN-KEYWORD,google
   - DOMAIN-KEYWORD,gmail
@@ -159,7 +166,7 @@ payload:
   # youtube
   - DOMAIN-KEYWORD,youtube
   - DOMAIN-SUFFIX,youtube.com
-  - DOMAIN,yt3.ggpht.com
+  - DOMAIN-SUFFIX,yt3.ggpht.com
   - DOMAIN-SUFFIX,ytimg.com
   - DOMAIN-SUFFIX,youtubeeducation.com
   - DOMAIN-SUFFIX,youtubegaming.com
@@ -171,10 +178,6 @@ payload:
 
 # > github
   - DOMAIN-SUFFIX,githubusercontent.com 
-  - DOMAIN,github-releases.githubusercontent.com 
-  - DOMAIN,actions.githubusercontent.com
-  - DOMAIN,pipelines.actions.githubusercontent.com
-  - DOMAIN,objects.githubusercontent.com 
   - DOMAIN,github-production-release-asset-2e65be.s3.amazonaws.com 
   - DOMAIN,github-production-user-asset-6210df.s3.amazonaws.com 
   - DOMAIN,github-cloud.s3.amazonaws.com 
@@ -183,16 +186,7 @@ payload:
   - DOMAIN,codeload.github.com 
   - DOMAIN,github.githubassets.com 
   - DOMAIN,assets-cdn.github.com 
-  - DOMAIN,raw.githubusercontent.com 
   - DOMAIN,raw.github.com 
-  - DOMAIN,camo.githubusercontent.com 
-  - DOMAIN,cloud.githubusercontent.com 
-  - DOMAIN,avatars.githubusercontent.com 
-  - DOMAIN,avatars0.githubusercontent.com 
-  - DOMAIN,avatars1.githubusercontent.com 
-  - DOMAIN,avatars2.githubusercontent.com 
-  - DOMAIN,avatars3.githubusercontent.com 
-  - DOMAIN,user-images.githubusercontent.com 
   - DOMAIN,github.blog 
   - DOMAIN-SUFFIX,github.com 
   - DOMAIN,api.github.com 
@@ -221,6 +215,7 @@ payload:
 ##openwrt-编译cdn end
 
 # > chatgpt
+  - DOMAIN,chatgpt.com
   - DOMAIN,chat.openai.com
   - DOMAIN-SUFFIX,openai.com
   - DOMAIN-SUFFIX,auth0.com
@@ -252,7 +247,7 @@ payload:
   - DOMAIN-SUFFIX,lumpofsugar.co.jp
   - DOMAIN-SUFFIX,nekonyansoft.com
   - DOMAIN-SUFFIX,nekoneko-soft.info
-  - DOMAIN-SUFFIX,hikarifield.co.jp
+  - DOMAIN,static.hikarifield.co.jp
   - DOMAIN-SUFFIX,madosoft.net
   - DOMAIN-SUFFIX,marmalade.com
   - DOMAIN-SUFFIX,mangagamer.com

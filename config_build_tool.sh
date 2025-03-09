@@ -1,26 +1,7 @@
 #!/usr/bin/env bash
 
-#MIT License
-
-#Copyright (c) 2023 沉默の金
-
-#Permission is hereby granted, free of charge, to any person obtaining a copy
-#of this software and associated documentation files (the "Software"), to deal
-#in the Software without restriction, including without limitation the rights
-#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-#copies of the Software, and to permit persons to whom the Software is
-#furnished to do so, subject to the following conditions:
-
-#The above copyright notice and this permission notice shall be included in all
-#copies or substantial portions of the Software.
-
-#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-#SOFTWARE.
+# SPDX-FileCopyrightText: Copyright (c) 2024-2025 沉默の金 <cmzj@cmzj.org>
+# SPDX-License-Identifier: MIT
 
 # 设置一个用于临时文件的目录，并在脚本退出时自动删除
 trap 'rm -rf "$TMPDIR"' EXIT
@@ -69,7 +50,7 @@ function install_dependencies() {
     case $PM in
         apt)
             # 检查并安装缺少的依赖包（基于apt包管理器）
-            for package_name in build-essential clang flex bison g++ gawk gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev python3-distutils rsync unzip zlib1g-dev file wget make; do
+            for package_name in build-essential clang flex bison g++ gawk gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev rsync unzip zlib1g-dev file wget make; do
             if [ "$(apt list --installed 2>/dev/null| grep -c "^${package_name}")" -eq '0' ];then
                 if test ${n} = 0; then
                     echo $package_name > $TMPDIR/install.list
@@ -269,20 +250,22 @@ function input_parameters() {
     if [ "$(grep -c "^ipaddr=" $TMPDIR/openwrtext.config)" -eq '1' ];then
         ipaddr=$(grep "^ipaddr=" $TMPDIR/openwrtext.config|sed -e "s/ipaddr=//")
     else
-        whiptail --title "错误" --msgbox "OpenWrt-K拓展配置下载未知错误，下载的文件中未检测到ip配置 ，下载链接：\n$DOWNLOAD_URL" 10 110
-        return 6
+        ipaddr="192.168.1.1"
     fi
     if [ "$(grep -c "^timezone=" $TMPDIR/openwrtext.config)" -eq '1' ];then
         timezone=$(grep "^timezone=" $TMPDIR/openwrtext.config|sed -e "s/timezone=//")
     else
-        whiptail --title "错误" --msgbox "OpenWrt-K拓展配置下载未知错误，下载的文件中未检测到时区配置 ，下载链接：\n$DOWNLOAD_URL" 10 110
-        return 6
+        timezone="CST-8"
     fi
     if [ "$(grep -c "^zonename=" $TMPDIR/openwrtext.config)" -eq '1' ];then
         zonename=$(grep "^zonename=" $TMPDIR/openwrtext.config|sed -e "s/zonename=//")
     else
-        whiptail --title "错误" --msgbox "OpenWrt-K拓展配置下载未知错误，下载的文件中未检测到时区区域名称配置 ，下载链接：\n$DOWNLOAD_URL" 10 110
-        return 6
+        zonename="Asia/Shanghai"
+    fi
+    if [ "$(grep -c "^golang_version=" $TMPDIR/openwrtext.config)" -eq '1' ];then
+        golang_version=$(grep "^golang_version=" $TMPDIR/openwrtext.config|sed -e "s/golang_version=//")
+    else
+        golang_version="22.x"
     fi
     DOWNLOAD_URL=https://raw.githubusercontent.com/$OpenWrt_K_repo/$OpenWrt_K_branch/config/$OpenWrt_K_config/OpenWrt-K/compile.config
     curl -o $TMPDIR/compile.config -s -L --retry 3 --connect-timeout 20  $DOWNLOAD_URL
@@ -297,22 +280,30 @@ function input_parameters() {
     if [ "$(grep -c "^kmod_compile_exclude_list=" $TMPDIR/compile.config)" -eq '1' ];then
         kmod_compile_exclude_list=$(grep "^kmod_compile_exclude_list=" $TMPDIR/compile.config|sed -e "s/kmod_compile_exclude_list=//")
     else
-        whiptail --title "错误" --msgbox "OpenWrt-K拓展编译配置下载未知错误，下载的文件中未检测到kmod编译排除列表配置 ，下载链接：\n$DOWNLOAD_URL" 10 110
-        return 6
+        kmod_compile_exclude_list="kmod-shortcut-fe-cm,kmod-shortcut-fe,kmod-fast-classifier,kmod-shortcut-fe-drv"
+    fi
+    if [ "$(grep -c "^use_cache=" $TMPDIR/compile.config)" -eq '1' ];then
+        use_cache=$(grep "^use_cache=" $TMPDIR/compile.config|sed -e "s/use_cache=//")
+    else
+        use_cache="true"
     fi
     whiptail --title "完成" --msgbox "你选择的OpenWrt branch或tag为: $OPENWRT_TAG_BRANCH\n选择的OpenWrt-K存储库地址为: $OpenWrt_K_url\n选择的OpenWrt-K存储库分支为: $OpenWrt_K_branch\n选择的配置为: $OpenWrt_K_config" 10 80
-    echo "警告：请勿手动修改本文件" > buildconfig.config 
-    echo OPENWRT_TAG_BRANCH=$OPENWRT_TAG_BRANCH >> buildconfig.config
-    echo OpenWrt_K_url=$OpenWrt_K_url >> buildconfig.config
-    echo OpenWrt_K_branch=$OpenWrt_K_branch >> buildconfig.config
-    echo OpenWrt_K_config=$OpenWrt_K_config >> buildconfig.config
-    echo ipaddr=$ipaddr >> buildconfig.config
-    echo timezone=$timezone >> buildconfig.config
-    echo zonename=$zonename >> buildconfig.config
-    echo "kmod_compile_exclude_list=$kmod_compile_exclude_list" >> buildconfig.config
+    {
+        echo "警告：请勿手动修改本文件"
+        echo OPENWRT_TAG_BRANCH="$OPENWRT_TAG_BRANCH"
+        echo OpenWrt_K_url="$OpenWrt_K_url"
+        echo OpenWrt_K_branch="$OpenWrt_K_branch"
+        echo OpenWrt_K_config="$OpenWrt_K_config"
+        echo ipaddr="$ipaddr"
+        echo timezone="$timezone"
+        echo zonename="$zonename"
+        echo golang_version="$golang_version"
+        echo use_cache="$use_cache"
+        echo "kmod_compile_exclude_list=$kmod_compile_exclude_list"
+    } > buildconfig.config
     if [ -n "$build_dir" ];then
-        echo build_dir=$build_dir >> buildconfig.config
-        rm -rf $build_dir/OpenWrt-K
+        echo build_dir="$build_dir" >> buildconfig.config
+        rm -rf "$build_dir"/OpenWrt-K
         whiptail --title "提示" --msgbox "请重新准备运行环境" 10 80
     fi
     # 调用config_ext_packages函数进行后续配置
@@ -1112,12 +1103,16 @@ openwrt_extension_config() {
     ipaddr=$(grep "^ipaddr=" buildconfig.config|sed -e "s/ipaddr=//")
     timezone=$(grep "^timezone=" buildconfig.config|sed -e "s/timezone=//")
     zonename=$(grep "^zonename=" buildconfig.config|sed -e "s/zonename=//")
+    golang_version=$(grep "^golang_version=" buildconfig.config|sed -e "s/golang_version=//")
+    use_cache=$(grep "^use_cache=" buildconfig.config|sed -e "s/use_cache=//")
     OPTION=$(whiptail --title "OpenWrt-k配置构建工具-拓展配置" --menu "选择你要修改的内容或选择Cancel退出" 16 80 8 \
     "1" "修改IP地址: $ipaddr" \
     "2" "修改时区：$timezone" \
     "3" "修改时区区域名称: $zonename" \
     "4" "修改内核模块(kmod)编译排除列表" \
-    "5" "恢复默认拓展配置"  3>&1 1>&2 2>&3)
+    "5" "修改golang版本: $golang_version" \
+    "6" "使用缓存: $use_cache" \
+    "7" "恢复默认拓展配置"  3>&1 1>&2 2>&3)
     exitstatus=$?
     if [ "$exitstatus" = "1" ]; then
         echo "你选择了退出"
@@ -1203,10 +1198,51 @@ openwrt_extension_config() {
             return 6
             ;;
         5)
+            # 修改golang版本
+            # 从 GitHub API 获取分支信息并提取名称
+            branches=$(curl -s -L https://api.github.com/repos/sbwml/packages_lang_golang/branches | sed -n '/^    "name": "/p' | sed -e 's/    "name": "//g' -e 's/",//g')
+
+            # 将分支名称存储到数组中
+            branch_array=($branches)
+
+            # 使用 whiptail 创建菜单
+            choices=()
+            index=1
+            for branch in "${branch_array[@]}"; do
+                choices+=("$index" "$branch")
+                ((index++))
+            done
+
+            # 获取用户选择
+            choice=$(whiptail --title "选择分支" --menu "请选择一个分支:" 15 60 4 "${choices[@]}" 3>&1 1>&2 2>&3)
+            exitstatus=$?
+            if [ $exitstatus != 0 ]; then
+                    echo "你选择了退出"
+                    return 6
+            fi
+
+            NEW_GOLANG_VERSION="${branch_array[choice-1]}"
+            sed -i "/^golang_version=/s#=.*#=$NEW_GOLANG_VERSION#g" buildconfig.config
+            return 6
+            ;;
+        6)
+            # 修改使用缓存
+            if [ "$use_cache" = "true" ] || [ "$use_cache" = "True" ] || [ "$use_cache" = "TRUE" ];then
+                sed -i "/^use_cache=/s#=.*#=false#g" buildconfig.config
+                use_cache="false"
+            else
+                sed -i "/^use_cache=/s#=.*#=true#g" buildconfig.config
+                use_cache="true"
+            fi
+            return 6
+            ;;
+        7)
             sed -i "/^ipaddr/s/=.*/=192.168.1.1/g" buildconfig.config
             sed -i "/^timezone=/s/=.*/=CST-8/g" buildconfig.config
             sed -i "/^zonename=/s#=.*#=Asia/Shanghai#g" buildconfig.config
             sed -i  "/^kmod_compile_exclude_list=/s/=.*/=kmod-shortcut-fe-cm,kmod-shortcut-fe,kmod-fast-classifier/g" buildconfig.config
+            sed -i "/^use_cache=/s/=.*/=true/g" buildconfig.config
+            sed -i "/^golang_version=/s/=.*/=22.x/g" buildconfig.config
             return 6
             ;;
         *)
@@ -1221,7 +1257,7 @@ function about() {
     whiptail --title "关于" --msgbox "\
 OpenWrt-k配置构建工具\n\
 \n\
-版本：v1.1\n\
+版本：v1.2\n\
 Copyright © 2023 沉默の金\n\
 \n\
 本软件基于MIT开源协议发布。你可以在MIT协议的允许范围内自由使用、修改和分发本软件。\n\
@@ -1343,9 +1379,11 @@ function build () {
     sed -n "/^EXT_PACKAGES/p" $build_dir/../buildconfig.config > $outputdir/OpenWrt-K/extpackages.config
     echo "openwrt_tag/branch=$(grep "^OPENWRT_TAG_BRANCH=" $build_dir/../buildconfig.config|sed  "s/OPENWRT_TAG_BRANCH=//")" > $outputdir/OpenWrt-K/compile.config
     echo "kmod_compile_exclude_list=$(grep "^kmod_compile_exclude_list=" $build_dir/../buildconfig.config|sed  "s/kmod_compile_exclude_list=//")" >> $outputdir/OpenWrt-K/compile.config
+    echo "use_cache=$(grep "^use_cache=" $build_dir/../buildconfig.config|sed  "s/use_cache=//")" >> $outputdir/OpenWrt-K/compile.config
     echo "ipaddr=$(grep "^ipaddr=" $build_dir/../buildconfig.config|sed -e "s/ipaddr=//")" > $outputdir/OpenWrt-K/openwrtext.config
     echo "timezone=$(grep "^timezone=" $build_dir/../buildconfig.config|sed -e "s/timezone=//")" >> $outputdir/OpenWrt-K/openwrtext.config
     echo "zonename=$(grep "^zonename=" $build_dir/../buildconfig.config|sed -e "s/zonename=//")" >> $outputdir/OpenWrt-K/openwrtext.config
+    echo "golang_version=$(grep "^golang_version=" $build_dir/../buildconfig.config|sed -e "s/golang_version=//")" >> $outputdir/OpenWrt-K/openwrtext.config
     # 输出配置文件
     [[ -d $build_dir/../config/$OpenWrt_K_config ]] && rm -rf $build_dir/../config/$OpenWrt_K_config
     mkdir -p $build_dir/../config/$OpenWrt_K_config
